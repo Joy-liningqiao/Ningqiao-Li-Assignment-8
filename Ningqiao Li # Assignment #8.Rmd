@@ -1,0 +1,86 @@
+---
+title: "Ningqiao Li Assignment #8"
+date: "April 6, 2020"
+output: html_notebook
+---
+
+* This is the eighth assignment in EDRM 718. *
+
+***
+
+### Item 1. Write a function that will compute the total score for respondents on a Likert scale. Your function should return a data frame that is the original data frame with an additional column added to the end that contains the score for each respondent.
+
+```{r}
+new_survey_data <- function(survey_data, scale_number, reverse_vec){
+  as.matrix(survey_data)
+  survey_data[, reverse_vec] <- (scale_number + 1) - survey_data[, reverse_vec]
+  sum_score <- rowSums(survey_data)
+  survey_data$sum <- sum_score
+  return(survey_data)
+}
+```
+
+***
+
+### Item 2. Write a script that reads in your data, sends it to your function for scoring, then writes the result to a CSV file that now contains the original data with the score added.
+
+```{r}
+library(here)
+hypo_data <- read_csv(here("Data", "Hypothetical data.csv"))
+hypo_data
+```
+
+```{r}
+new_hypo_data <- new_survey_data(hypo_data, 6, c(2, 3, 4))
+new_hypo_data
+write.csv(new_hypo_data, here("Data", "New Hypothetical data.csv"))
+```
+
+***
+
+### Item 3. Use the hsb2 data and ggplot2 to construct a single scatterplot showing the relationship of science scores (response) to math scores (explanatory) by gender.
+
+```{r include=FALSE}
+library(tidyverse)
+library(here)
+hsb2 <- read_csv(here("Data", "hsb2.csv"))
+```
+
+```{r include=FALSE}
+hsb2$female <- factor(hsb2$female, 
+                      labels = c("male", "female"),
+                      ordered = "TRUE")
+```
+
+```{r}
+ggplot(data = hsb2) +
+  geom_point(mapping = aes(x = science, y = math, color = female)) +
+  labs(x = "Science score", y = "Math score",
+       title = "Relationship between science and math score by gender")
+```
+
+***
+
+### Item 4. Show the relationship of science scores to math scores by gender, but this time facet on gender to show separate scatterplots.
+
+```{r}
+ggplot(data = hsb2) +
+  geom_point(mapping = aes(x = science, y = math, color = female)) +
+  labs(x = "Science score", y = "Math score",
+       title = "Relationship between science and math score by gender") +
+  facet_wrap (~ female)
+  
+```
+
+***
+
+### Item 5. Using your ggplot2 cheat sheet and the hsb2 data, create a graph using a geom that was not mentioned in the lecture. Briefly describe what your graph is illustrating.
+
+The graph illustrates the individual cases of both continuous varibales.
+
+```{r}
+ggplot(data = hsb2, aes(x = science, y = math)) +
+  geom_rug(sides = "bl")
+```
+
+***
